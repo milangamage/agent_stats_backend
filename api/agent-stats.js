@@ -1,24 +1,24 @@
 const mysql = require('mysql2/promise');
 
 module.exports = async (req, res) => {
-
+    // ✅ Add CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');  // Allow all origins (for development)
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+    // Handle preflight OPTIONS request
     if (req.method === 'OPTIONS') {
-        return res.status(200).end();  // Handle preflight request
+        return res.status(200).end();
     }
 
-
-    const db = await mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASS,
-        database: process.env.DB_NAME,
-    });
-
     try {
+        const db = await mysql.createConnection({
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASS,
+            database: process.env.DB_NAME,
+        });
+
         const [rows] = await db.execute(`
       SELECT 
         agent_name,
@@ -34,9 +34,7 @@ module.exports = async (req, res) => {
 
         res.status(200).json(rows);
     } catch (error) {
-        console.error(error);
+        console.error('Error fetching agent stats:', error);
         res.status(500).json({ error: 'Error fetching agent stats' });
-    } finally {
-        await db.end();
     }
 };
