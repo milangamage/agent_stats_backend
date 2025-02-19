@@ -1,6 +1,16 @@
 const mysql = require('mysql2/promise');
 
 module.exports = async (req, res) => {
+
+    res.setHeader('Access-Control-Allow-Origin', '*');  // Allow all origins (for development)
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();  // Handle preflight request
+    }
+
+
     const db = await mysql.createConnection({
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
